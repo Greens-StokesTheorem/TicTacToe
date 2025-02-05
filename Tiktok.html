@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="tiktok.js"></script>
+    
+</head>
+ 
+ 
+<style>
+ 
+html {
+        height: 100%;
+}
+ 
+body {
+        margin: 0;
+        background-image: linear-gradient(to bottom right, #2ef1ff, rgb(238, 102, 204));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        flex-flow: row;
+}
+ 
+ 
+.button {
+        border: none;
+        color: white;
+        /* padding: 50px 50px; */
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        /* margin: 50px 100px; */
+        cursor: pointer;
+        border-radius: 10px;
+        height: 140px;
+        width: 150px;
+        position: relative;
+        animation: clickbutton 1s linear;
+        background-color: #c738ff54;
+ 
+}
+ 
+/* .button1 {background-color: #39d69df8; } 
+.button2 {background-color: #39d69df8; } 
+.button3 {background-color: #39d69df8; } 
+.button4 {background-color: #39d69df8; } 
+.button5 {background-color: #39d69df8; } 
+.button6 {background-color: #39d69df8; } 
+.button7 {background-color: #39d69df8; } 
+.button8 {background-color: #39d69df8; } 
+.button9 {background-color: #39d69df8; }  */
+ 
+.circle {
+        top: 50%;
+        left: 50%       ;
+        height: 100px;
+        width: 100px;
+        border-radius: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        border: 13px solid blueviolet;
+}
+ 
+ 
+.cross {
+        position: absolute;
+        width: 60px; /* Adjust the size as needed */
+        height: 60px; /* Adjust the size as needed */
+        /* display: flex;
+        justify-content: center; */
+        /* align-items: center; */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+}
+ 
+.cross::before, .cross::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 11px; /* Adjust the thickness as needed */
+        height: 120px; /* Adjust the height as needed */
+        background-color: rgb(201, 0, 0); /* Adjust the color as needed */
+}
+.cross::before {transform: translate(-50%, -50%) rotate(45deg);}
+.cross::after {transform: translate(-50%, -50%) rotate(-45deg);}
+ 
+ 
+.line {
+  height: 20px;
+  background: rgb(255, 32, 32);
+  z-index: 2;
+  position: absolute;
+  width: 20px;
+  top: inherit;
+  left: inherit;
+} 
+
+ 
+</style>
+ 
+<body>
+ 
+ 
+<div id="gridbox" style="display: flex; width: 500px; flex-wrap: wrap; gap: 10px;">    
+    <button id="0" class="button button1" onclick="togglefunc(0);">  <div id="circle0"></div>  </button>
+    <button id="1" class="button button2" onclick="togglefunc(1);">  <div id="circle1"></div>  </button>
+    <button id="2" class="button button3" onclick="togglefunc(2);">  <div id="circle2"></div>  </button>
+    <button id="3" class="button button4" onclick="togglefunc(3);">  <div id="circle3"></div>  </button>
+    <button id="4" class="button button5" onclick="togglefunc(4);">  <div id="circle4"></div>  </button>
+    <button id="5" class="button button6" onclick="togglefunc(5);">  <div id="circle5"></div>  </button>
+    <button id="6" class="button button7" onclick="togglefunc(6);">  <div id="circle6"></div>  </button>
+    <button id="7" class="button button8" onclick="togglefunc(7);">  <div id="circle7"></div>  </button>
+    <button id="8" class="button button9" onclick="togglefunc(8);">  <div id="circle8"></div>  </button>
+</div>
+ 
+ 
+ 
+ 
+ 
+<div style="position: absolute;top: 0px ; left: 2%; vertical-align: top; display: inline-block; ">
+        <h1 id="array" style="padding-bottom: 0px; height: 20px;" >Array</h1>
+        <button onclick="drawwinningline()">????</button>
+        <button onclick="clearall()">clear</button>
+</div>
+ 
+ 
+ 
+</body>
+</html>
