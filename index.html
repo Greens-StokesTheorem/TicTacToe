@@ -39,7 +39,7 @@ body {
         /* margin: 50px 100px; */
         cursor: pointer;
         border-radius: 10px;
-        height: 140px;
+        height: 150px;
         width: 150px;
         position: relative;
         animation: clickbutton 1s linear;
@@ -104,13 +104,104 @@ body {
   left: inherit;
 } 
 
- 
+.statsscreen{
+    height: 60%;
+    width: 20%;
+    position: absolute;
+    top: 5%;
+    right: 2.5%;
+    /* transform: translate(-50%); */
+    background-color: #e0d9ffa8;
+    visibility: visible;
+    font-size: 1.8rem;
+    z-index: 2;
+    color: white;
+    padding: 1rem 1rem;
+    border-radius: 8px;
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+    cursor: grab;
+}
+
+#progressbar1{
+        position: absolute;
+        bottom: 1rem;
+        left: 1rem;
+        height: 20rem;
+        width: 5rem;
+        background-color: burlywood;
+        overflow: hidden;
+}
+
+#progressbar2{
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        height: 20rem;
+        width: 5rem;
+        background-color: burlywood;
+}
+
+
+#progress1{
+        position: absolute;
+        width: inherit;
+        height: 0%;
+        bottom: 0px;
+        right: inherit;
+        background-color: #2ef1ff;
+}
+
+#progress2{
+        position: absolute;
+        width: inherit;
+        height: 0%;
+        bottom: 0px;
+        left: inherit;
+        background-color: #2ef1ff;
+}
+
+#winscreen {
+        height: 20%;
+        width: 20%;
+        position: absolute;
+        top: 16%;
+        left: 2.5%;
+        /* transform: translate(-50%); */
+        background-color: #a793ffd8;
+        visibility: hidden;
+        font-size: 1.8rem;
+        z-index: 2;
+        color: rgb(36, 36, 36);
+        padding: 1rem 1rem;
+        border-radius: 8px;
+        align-content: center;
+        justify-content: center;
+        text-align: center;
+}
+
+#countdown {
+        font-size: 2rem;
+}
+
+.counter {
+        text-align: center;
+        align-items: center;
+        align-self: center;
+        justify-content: center;
+        justify-self: center;
+        top: 40%;
+        position: relative;
+        z-index: 3;
+}
+
 </style>
  
 <body>
  
  
-<div id="gridbox" style="display: flex; width: 500px; flex-wrap: wrap; gap: 10px;">    
+<div id="gridbox" style="display: flex; width: 470px; flex-wrap: wrap; gap: 10px;">    
     <button id="0" class="button button1" onclick="togglefunc(0);">  <div id="circle0"></div>  </button>
     <button id="1" class="button button2" onclick="togglefunc(1);">  <div id="circle1"></div>  </button>
     <button id="2" class="button button3" onclick="togglefunc(2);">  <div id="circle2"></div>  </button>
@@ -132,7 +223,23 @@ body {
         <button onclick="clearall()">clear</button>
 </div>
  
- 
- 
+<div id="winscreen">
+        <!-- <div id="countdown"></div> -->
+</div> 
+
+<div id="statsscreen" class="statsscreen">
+
+        <div id="progressbar1">
+                <div class="counter" id="counter1">0</div>
+                <div id="progress1"></div>
+        </div>
+
+        <div id="progressbar2">
+                <div class="counter" id="counter2">0</div>
+                <div id="progress2"></div>
+        </div>
+
+</div> 
+
 </body>
 </html>
