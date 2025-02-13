@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="tiktok.js"></script>
     
 </head>
  
@@ -14,17 +13,27 @@
  
 html {
         height: 100%;
+        width: 100%;
 }
  
 body {
         margin: 0;
         background-image: linear-gradient(to bottom right, #2ef1ff, rgb(238, 102, 204));
+        background-image: linear-gradient(to bottom right, #98f8ff, rgb(132, 87, 255));
         display: flex;
         align-items: center;
         justify-content: center;
         height: 100%;
         width: 100%;
         flex-flow: row;
+        /* background: radial-gradient(circle at top left,transparent 9%, #ffcaf7 10% ,#ffcaf7 15% , transparent 16%) , radial-gradient(circle at bottom left,transparent 9%, #ffcaf7 10% ,#ffcaf7 15% , transparent 16%), radial-gradient(circle at top right ,transparent 9%, #ffcaf7 10% ,#ffcaf7 15% , transparent 16%) , radial-gradient(circle at bottom right,transparent 9%, #ffcaf7 10% ,#ffcaf7 15% , transparent 16%),radial-gradient(circle, transparent 25%, #ffffff  26%),linear-gradient(45deg, transparent 46%, #ffcaf7 47%, #ffcaf7 52%, transparent 53%), linear-gradient(135deg, transparent 46%, #ffcaf7 47%, #ffcaf7 52%, transparent 53%);
+        background-size: 3em 3em;
+        background-color: #ffffff;
+        opacity: 1;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden; */
 }
  
  
@@ -44,19 +53,9 @@ body {
         position: relative;
         animation: clickbutton 1s linear;
         background-color: #c738ff54;
- 
+        
 }
- 
-/* .button1 {background-color: #39d69df8; } 
-.button2 {background-color: #39d69df8; } 
-.button3 {background-color: #39d69df8; } 
-.button4 {background-color: #39d69df8; } 
-.button5 {background-color: #39d69df8; } 
-.button6 {background-color: #39d69df8; } 
-.button7 {background-color: #39d69df8; } 
-.button8 {background-color: #39d69df8; } 
-.button9 {background-color: #39d69df8; }  */
- 
+  
 .circle {
         top: 50%;
         left: 50%       ;
@@ -93,11 +92,11 @@ body {
 .cross::before {transform: translate(-50%, -50%) rotate(45deg);}
 .cross::after {transform: translate(-50%, -50%) rotate(-45deg);}
  
- 
+
 .line {
   height: 20px;
   background: rgb(255, 32, 32);
-  z-index: 2;
+  z-index: 1;
   position: absolute;
   width: 20px;
   top: inherit;
@@ -114,7 +113,7 @@ body {
     background-color: #e0d9ffa8;
     visibility: visible;
     font-size: 1.8rem;
-    z-index: 2;
+    z-index: 1;
     color: white;
     padding: 1rem 1rem;
     border-radius: 8px;
@@ -194,14 +193,197 @@ body {
         top: 40%;
         position: relative;
         z-index: 3;
+        font-family: monospace;
+}
+
+.menublur {
+        /* background-color: white; */
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background: rgba(39, 39, 39, 0.1);
+        backdrop-filter: blur(5px);
+        z-index: 2;
+}
+
+.popupstyle {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 37rem;
+    width: 55rem;
+    background-color: #e7b2ff31;
+    border-radius: 1rem;
+    box-shadow: 0 1rem 2rem hsla(0, 0%, 0%, 0.336);
+    backdrop-filter: blur(5px);
+    z-index: 3;
+}
+
+.popupstyle.slideleft {
+        animation-name: slide;
+        animation-duration: 1s;
+        /* animation-fill-mode: forwards ; */
+}
+
+
+@keyframes slide {
+        0% { left: 50%; top: 50%; height: 37rem; width: 55rem;}
+
+        100% { left: 5%; top: 50%; height: 37rem; width: 3rem;
+                box-shadow: 0 1rem 1rem hsla(0, 0%, 0%, 0.068);
+        }
+}
+
+.gamemenu {
+        /* visibility: hidden; */
+        position: absolute;
+        /* display: flex; */
+        left: 5%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        height: 37rem;
+        width: 3rem;
+        background-color: #e7b2ff31;
+        border-radius: 1rem;
+        box-shadow: 0 1rem 1rem hsla(0, 0%, 0%, 0.068);
+        backdrop-filter: blur(5px);
+        z-index: 3;
+        transform-origin: left;
+        transition: 200ms ease;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        row-gap: 0.7rem;
+        display: none;
+}
+.gamemenu:hover {
+        /* animation-name: slideout; */
+        /* animation-duration: 0.6s; */
+        /* animation-timing-function: ease; */
+        /* transform-origin: left; */
+        /* animation-fill-mode: forwards; */
+        width: 5rem;
+        box-shadow: 0 1rem 1rem hsla(188, 100%, 15%, 0.308);
+
+}
+
+.buttondifficulty {
+    position: absolute;
+    height: 3rem;
+    width: 7rem;
+    border-radius: 0.8rem;
+    border-width: 0px;
+    font-size: 1.1rem;
+    font-weight: 200;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+}
+
+.buttonhard {
+    top: 55%;
+    left: 10%;
+    background-color: #e97f96;
+    color: white;
+    font-weight: 700;
+    font-size: 1.35rem;
+}
+.buttoneasy {
+    top: 55%;
+    left: 55%;
+    background-color: #b1abff;
+    color: white;
+    font-weight: 700;
+    font-size: 1.35rem;
+}
+
+.buttoneasy.hide {
+        animation-name: hideopacityeasy;
+        animation-duration: 1s;
+        /* animation-fill-mode: forwards ; */
+}
+@keyframes hideopacityeasy {
+        0%{background-color: #b1abff;}
+        50%{opacity: 0;}
+        100%{opacity: 0;}
+}
+.buttonhard.hide {
+        animation-name: hideopacityhard;
+        animation-duration: 1s;
+        /* animation-fill-mode: forwards ; */
+}
+@keyframes hideopacityhard {
+        0%{background-color: #e97f96;}
+        50%{opacity: 0;}
+        100%{opacity: 0;}
+}
+
+#whichturn {
+        font-size: 2.2rem;
+        position: absolute;
+        left: 50%;
+        top: 3rem;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+        font-family:Arial, Helvetica, sans-serif;
+        font-weight: bold;
+}
+
+.circleicon {
+        height: 2rem;
+        width: 2rem;
+        border-radius: 1rem;
+        opacity: 0;
+        text-align: center;
+        align-content: center;
+        font-weight: bold;
+        transition: 0.4s ease;
+        color: white;
+        user-select: none;
+}
+
+.circleicon1 { background-color: rgb(150, 38, 255); color: white; padding-top: 3px;}
+.circleicon2 { background-color: chartreuse; color: rgba(255, 255, 255, 0);}
+.circleicon3 { background-color: rgb(255, 46, 46); color: rgba(255, 255, 255, 0);}
+
+.circleicon.fade {
+        animation-name: fadein;
+        animation-duration: 0.6s;
+        animation-fill-mode: forwards;
+}
+@keyframes fadein {
+        from {opacity: 0;}
+        to {opacity: 1;}
+}
+
+body:has(.gamemenu:hover) .circleicon {
+        width: 4rem;
+        color: white;
 }
 
 </style>
  
-<body>
+<body onload="">
  
- 
-<div id="gridbox" style="display: flex; width: 470px; flex-wrap: wrap; gap: 10px;">    
+<div id="popup" class="popupstyle">
+        <div id="buttonhard" class="buttondifficulty buttonhard">Hard</div>
+        <div id="buttoneasy" class="buttondifficulty buttoneasy">Easy</div>
+</div> 
+
+<div id="menu" class="gamemenu">
+        <div id="circlebin" class="circleicon circleicon1">🗑</div>
+        <div id="circleeasy" class="circleicon circleicon2">Easy</div>
+        <div id="circlehard" class="circleicon circleicon3">Hard</div>
+
+</div>
+
+
+<!-- <div id="menublur" class="menublur"></div> -->
+
+<div id="gridbox" style="display: flex; width: 470px; flex-wrap: wrap; gap: 10px;" tabindex="-1">    
     <button id="0" class="button button1" onclick="togglefunc(0);">  <div id="circle0"></div>  </button>
     <button id="1" class="button button2" onclick="togglefunc(1);">  <div id="circle1"></div>  </button>
     <button id="2" class="button button3" onclick="togglefunc(2);">  <div id="circle2"></div>  </button>
@@ -229,6 +411,7 @@ body {
 
 <div id="statsscreen" class="statsscreen">
 
+        <div id="whichturn"></div>
         <div id="progressbar1">
                 <div class="counter" id="counter1">0</div>
                 <div id="progress1"></div>
@@ -240,6 +423,9 @@ body {
         </div>
 
 </div> 
+
+<script src="tiktok.js"></script>
+
 
 </body>
 </html>
