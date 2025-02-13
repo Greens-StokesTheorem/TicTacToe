@@ -1,6 +1,10 @@
+const corners = [0,2,6,8]
+const middle = 4
+const sides = [1,3,5,7]
+let gofirst = 0   //      0 computer starts       1 player starts
 let togglestate = [0,0,0,0,0,0,0,0,0]
 let activelist = [0,1,2,3,4,5,6,7,8]
-let player = 0
+let player = 1      // Change later currently 1 is for computer start 0 is player start
 let activegame = true
 let computerturn = 0, playerturn = 0;
 let computervalue = [], playervalue = [];
@@ -9,12 +13,13 @@ const winningcombinations = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8
 //                                     0 0 0             0          0           0     0         0
 //                                              0 0 0    0          0           0       0     0
 let playerwin = 0, computerwin = 0
+let difficulty = 2;  // 0 is two player      1 is random (easy) computer        2 is hard computer
+let startedgame = false
 
 
 function countdown(num) {
     document.getElementById("countdown").innerHTML = `${num}`
 }
-
  
 function togglefunc(number) {
  
@@ -31,6 +36,7 @@ function togglefunc(number) {
         activelist.splice(activelist.indexOf(number), 1)    //  Remove item from active list for computer
         checkwin()
         button.blur()
+        document.getElementById("whichturn").innerHTML = "Player 2's turn"
  
  
     } else if (activegame == false){
@@ -40,7 +46,11 @@ function togglefunc(number) {
     }
  
     if (player == 1) {
-        computer()
+        
+        // Inline if statement
+        difficulty == 2 ? ai() : computer()
+        document.getElementById("whichturn").innerHTML = "Player 1's turn"
+
     } else {
         //pass
     }
@@ -89,6 +99,7 @@ function checkwin(){
             winscreen.style.visibility = "visible"
             document.getElementById("winscreen").innerHTML = "It's a draw!"
             activegame = false
+            drawline(8)
 
             //  Adds countdown to the popup
             let countdowntext = document.createElement("div")
@@ -104,7 +115,7 @@ function checkwin(){
 
 
 
-        } else if (activegame == false && activelist.length > 0){
+        } else if (activegame == false){
 
             winscreen.style.visibility = "visible"
             winscreen.innerHTML = winner
@@ -146,12 +157,50 @@ function computer() {
         let randm = Math.floor(Math.random() * activelist.length)
         let newvalue = activelist[randm]
         //  Clicks the position
-        document.getElementById(newvalue).click()
-        document.getElementById(newvalue).blur()
-        checkwin()
+        document.getElementById(newvalue).click();
+        document.getElementById(newvalue).blur();
+        // checkwin()
     } 
 }
  
+function ai() {
+
+    console.log("ai");
+    if (activegame == true) {
+
+        if (activelist.length == 9) {
+            //  Bot either starts in center or corner
+
+            let centerorcorner = Math.floor(Math.random() * 2)
+            //  Generated either 0 or 1 randomly
+            //  center is 0      corner is 1
+            if (centerorcorner == 0) {
+
+                document.getElementById("4").click()
+                document.getElementById("4").blur();
+
+            } else if (centerorcorner == 1) {
+
+                // Picks a random corner at random
+                let cornerlocation = Math.floor(Math.random() * corners.length);
+                document.getElementById(`${corners[cornerlocation]}`).click();
+                document.getElementById(`${corners[cornerlocation]}`).blur();
+            }
+
+        } else if (activelist.includes(4)) {    //  If the center is avaliable
+
+            document.getElementById("4").click();
+            document.getElementById("4").blur();
+
+        }
+
+
+
+
+    }
+
+}
+
  
 function createacircle(id) {
  
@@ -163,9 +212,8 @@ function createacircle(id) {
     } else {
         newcontainer.classList.add("cross");    //   Or cross
     }
- 
+
     container.appendChild(newcontainer);    //      Adds div to the button
- 
 }
  
  
@@ -201,6 +249,7 @@ function clearall(){
     }
 
     document.getElementById("array").innerHTML = "Click to start";
+    document.getElementById("whichturn").innerHTML = ""
 
 
     //    Resets all values to restart game
@@ -274,6 +323,12 @@ function drawline(winningposition){
         line1.style.top = "50%";
         line1.style.rotate = "135deg";
 
+    } else {
+
+        line1.style.height = "0px"
+        line1.style.width = "0px"
+        console.log("draw")
+
     }
 
 
@@ -337,3 +392,97 @@ function addprogress(number) {
     document.getElementById(`progress${number}`).style.height = `${percent + 20}px`
 
 }
+
+function onloading() {
+
+    if (gofirst == 0 || player == 1) {
+        ai()
+    }
+
+}
+
+const easybutton = document.getElementById("buttoneasy")
+const hardbutton = document.getElementById("buttonhard")
+
+easybutton.addEventListener("pointerdown", function (event) {
+    difficulty = 1
+    gofirst = 1
+    player = 0
+    // document.getElementById("popup").style.visibility = "hidden"
+    document.getElementById("popup").classList.add("slideleft")
+    document.getElementById("buttoneasy").classList.add("hide")
+    document.getElementById("buttonhard").classList.add("hide")
+    const delay = setTimeout(function () { document.getElementById("whichturn").innerHTML = ("Player 1's turn") }, 500)
+    
+})
+
+hardbutton.addEventListener("pointerdown", function (event) {
+    difficulty = 2
+    gofirst = 0
+    player = 1
+    document.getElementById("popup").style.display = "none"
+    ai()
+})
+
+
+document.getElementById("buttoneasy").addEventListener("animationend", function (event) {
+
+    const menu = document.getElementById("popup")
+    // menu.style.left = "5%"
+    // menu.style.top = "50%"
+    // menu.style.width = "5rem"
+    // menu.style.boxShadow = "0 1rem 1rem hsla(0, 0%, 0%, 0.068)"
+    document.getElementById("buttoneasy").style.opacity = "0"
+    document.getElementById("buttonhard").style.opacity = "0"
+    // menu.classList.add("popup:hover")
+    startedgame = true
+    // menu.style.visibility = "hidden"
+    menu.style.display = "none"
+    document.getElementById("menu").style.display = "flex"
+    document.getElementById("circlebin").classList.add("fade")
+    document.getElementById("circleeasy").classList.add("fade")
+    document.getElementById("circlehard").classList.add("fade")
+
+
+})
+
+
+
+document.addEventListener("keydown", function (event) {
+
+    if (event.key == "r") {
+        const buttoneasy = document.getElementById("buttoneasy")
+        const buttonhard = document.getElementById("buttonhard")
+        const popup = document.getElementById("popup")
+
+        // document.getElementById("menu").style.visibility = "hidden"
+        document.getElementById("menu").style.display = "none"
+        // document.getElementById("popup").style.visibility = "visible"
+        document.getElementById("popup").style.display = "block"
+        buttoneasy.classList.remove("hide")
+        buttonhard.classList.remove("hide")
+        popup.classList.remove("slideleft")
+        buttoneasy.style.opacity = 1
+        buttonhard.style.opacity = 1
+        clearall()
+    }
+
+})
+// document.getElementById("popup").addEventListener("pointerenter", function (event) {
+
+//     if (startedgame == true) {
+//         function extend() {
+//             let currentwidth = document.getElementById("popup").style.offsetWidth
+//             let newwidth = currentwidth + 1
+//             document.getElementById("popup").style.left = `${newwidth}rem`
+//             if (newwidth < 50) {
+//                 requestAnimationFrame(extend)
+//             }
+//         }
+//         extend()
+//     }
+
+// })
+
+
+// onloading()
