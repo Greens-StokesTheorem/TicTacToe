@@ -15,7 +15,9 @@ const winningcombinations = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8
 let playerwin = 0, computerwin = 0
 let difficulty = 2;  // 0 is two player      1 is random (easy) computer        2 is hard computer
 let startedgame = false
-let blockedlist = []
+let blockedlistcomp = []
+let blockedlistplayer = []
+var delay0, delay1, delay2, delay3;
 
 
 function countdown(num) {
@@ -64,7 +66,7 @@ function checkwin(){
 
 
     const winscreen = document.getElementById("winscreen")
-    if (playerturn >= 3){
+    if (playerturn >= 2){
 
         let locationcombination;
         let winner;
@@ -95,7 +97,7 @@ function checkwin(){
             }
         }
 
-        if (activelist.length == 0 && activegame == true) {    //  If all squares are filled but no combination
+        if (activelist.length == 0 && activegame == true) {    //  If all squares are filled but no combination (draw)
 
             winscreen.style.visibility = "visible"
             document.getElementById("winscreen").innerHTML = "It's a draw!"
@@ -112,11 +114,14 @@ function checkwin(){
             delay1 = window.setTimeout(countdown, 2000, 1)
             delay2 = window.setTimeout(function () {
                 winscreen.style.visibility = "hidden";
-                clearall();}, 3000)
+                clearall();
+                }, 3000)
 
+            if (difficulty == 2) {
+                delay3 = window.setTimeout(ai, 3000)
+            }
 
-
-        } else if (activegame == false){
+        } else if (activegame == false && activelist.length > 0){
 
             winscreen.style.visibility = "visible"
             winscreen.innerHTML = winner
@@ -131,9 +136,16 @@ function checkwin(){
             delay0 = window.setTimeout(countdown, 1000, 2)
             delay1 = window.setTimeout(countdown, 2000, 1)
             delay2 = window.setTimeout(function () {
+                alert("/")
                 winscreen.style.visibility = "hidden";
-                clearall();}, 3000)
+                clearall();
+            }, 3000)
 
+            if (difficulty == 2) {
+                delay3 = window.setTimeout(ai, 3000)
+            }
+
+            
         }
     }
 }
@@ -160,32 +172,45 @@ function computer() {
         //  Clicks the position
         document.getElementById(newvalue).click();
         document.getElementById(newvalue).blur();
-        // checkwin()
     } 
 }
  
-// let differencearray = []
-
 
 function ai() {
 
-    let differencearray = []
-    let difference = 0;
+    let differencearraycomp = [];
+    let differencecomp = [];
+    let newdifferencecomp = [];
+    let differencearrayplayer = [];
+    let differenceplayer = [];
+    let newdifferenceplayer = [];
 
 
     for (x = 0; x < 8 ; x++) {
         if(intersection(playervalue, winningcombinations[x]) == true) {
-            // console.log(x)
             let diff = winningcombinations[x].filter((value) => !playervalue.includes(value)).toString()
-            differencearray.push(diff);
-            // console.log(`difference is ${diff}`)
+            differencearraycomp.push(diff);
         }
     }
-    
-    difference = differencearray.filter(value => !blockedlist.includes(value)).toString();
+
+    for (x = 0; x < 8 ; x++) {
+        if(intersection(computervalue, winningcombinations[x]) == true) {
+            let diff = winningcombinations[x].filter((value) => !computervalue.includes(value)).toString()
+            differencearrayplayer.push(diff);
+        }
+    }
+
+    differencecomp = differencearraycomp.filter(value => !blockedlistcomp.includes(value));
+    differenceplayer = differencearrayplayer.filter(value => !blockedlistplayer.includes(value));
 
 
-    // console.log("ai");
+    newdifferencecomp = differencecomp.filter(value => !`${computervalue}`.includes(value));
+    newdifferenceplayer = differenceplayer.filter(value => !`${playervalue}`.includes(value));
+
+    console.log(`new difference is ${newdifferenceplayer}`)
+
+
+
     if (activegame == true) {
 
         //  Priority is to go first
@@ -213,16 +238,35 @@ function ai() {
             document.getElementById(activelist[0]).click()
 
         //  Second Priority is to block player if they're about to win
-        } else if (computervalue.includes(difference) == false && computervalue.length > 1 && difference.length > 0) {
-    
-            console.log(`${difference} is the difference`)
-            document.getElementById(difference).click()
-            if ( !(difference in blockedlist)) {
-                blockedlist.push(difference)
+
+        } else if (newdifferencecomp.length == 1) {
+
+            document.getElementById(newdifferencecomp).click()
+            if ( !(newdifferencecomp in blockedlistcomp)) {
+                blockedlistcomp.push(newdifferencecomp)
             }
-            // blockedlist.push(difference)
-            console.log("locked")
+
+        } else if (computervalue.includes(differencecomp) == false && computervalue.length > 1 && newdifferencecomp.length > 1) {
         
+            console.log(`${newdifferencecomp[0]} is the difference`)
+            document.getElementById(newdifferencecomp[0]).click()
+            if ( !(newdifferencecomp[0] in blockedlist)) {
+                blockedlist.push(newdifferencecomp[0])
+            }
+   
+        } else if (computervalue.includes(differencecomp) == false && computervalue.length > 1 && newdifferenceplayer.length == 1) {
+
+            document.getElementById(newdifferenceplayer).click()
+            if ( !(newdifferenceplayer in blockedlistplayer)) {
+                blockedlistplayer.push(newdifferenceplayer)
+            }
+
+        } else if (computervalue.includes(differencecomp) == false && computervalue.length > 1 && newdifferenceplayer.length > 1) {
+
+            document.getElementById(newdifferenceplayer[0]).click()
+            if ( !(newdifferenceplayer[0] in blockedlist)) {
+                blockedlist.push(newdifferenceplayer[0])
+            }
 
         } else if (activelist.includes(4)) {    //  If the center is avaliable
 
@@ -245,11 +289,10 @@ function ai() {
             document.getElementById(`${activelist[random]}`).click()
         }
 
-        
-
+        checkwin()
 
     }
-
+    
 }
 
  
@@ -311,6 +354,14 @@ function clearall(){
     computerturn = 0, playerturn = 0;
     computervalue = [], playervalue = [];
     blockedlist = []
+    gofirst = 1
+    blockedlistcomp = []
+    blockedlistplayer = []
+
+    if (difficulty == 2) {
+        gofirst = 0
+        player = 1
+    }
 
 }
 
@@ -383,12 +434,6 @@ function drawline(winningposition){
 
     }
 
-
-    // line1.style.left = "50%";
-    // line1.style.top = "50%";
-    // line1.style.rotate = "45deg"
-
-
     document.body.appendChild(line1);
 }
 
@@ -418,7 +463,22 @@ document.addEventListener("keydown", function (event) {
 
 document.addEventListener("pointerdown", function (event) {
 
-    if (activegame == false) {
+    if (activegame == false && difficulty == 2) {
+
+        window.clearTimeout(delay0)
+        window.clearTimeout(delay1)
+        window.clearTimeout(delay2)
+        window.clearTimeout(delay3)
+
+        disablebutton(true)
+
+        winscreen.style.visibility = "hidden";
+        clearall()
+        document.getElementById("winline").remove()
+        disablebutton(false)
+        ai()
+
+    } else if (activegame == false) {
 
         window.clearTimeout(delay0)
         window.clearTimeout(delay1)
@@ -426,6 +486,7 @@ document.addEventListener("pointerdown", function (event) {
 
         winscreen.style.visibility = "hidden";
         clearall()
+
     }
 
 })
@@ -449,6 +510,23 @@ function onloading() {
 
     if (gofirst == 0 || player == 1) {
         ai()
+    }
+
+}
+
+//      true = disable   false = enable
+function disablebutton(boolean) {
+
+    if (boolean == true) {
+        for (x = 0; x < 8; x++) {
+            const button = document.getElementById(`${x}`)
+            button.disabled = true
+        }
+    } else if (boolean == false) {
+        for (x = 0; x < 8; x++) {
+            const button = document.getElementById(`${x}`)
+            button.disabled = false
+        }
     }
 
 }
@@ -539,42 +617,5 @@ function intersection(arr1, arr2) {
         return false
     }
 
-    //  Find the common values of player value and all 8 of the winningcombinations
-
-    // let iftwo = (common.length == 2) ? alert("/") : console.log("not two")
-    //  If the intersection of the arrays is two, meaning 1 move away from winning
-
-    // for (x = 0; x < 8; x++) {
-    //     let thirdvaluelocation = common.filter(value => winningcombinations[x].includes(value))
-    //     if (thirdvaluelocation.length == 2) {
-    //         combinationlocation = x
-    //         console.log(`this is the location of the combination${x}`)
-    //         console.log(thirdvaluelocation)
-
-    //         let difference = winningcombinations[x].filter((value) => !arr1.includes(value));
-    //         console.log(difference)
-    //     }
-    // }
-
-    // let difference = winningcombinations[x].filter((value) => !arr1.includes(value));
-
 }
 
-// document.getElementById("popup").addEventListener("pointerenter", function (event) {
-
-//     if (startedgame == true) {
-//         function extend() {
-//             let currentwidth = document.getElementById("popup").style.offsetWidth
-//             let newwidth = currentwidth + 1
-//             document.getElementById("popup").style.left = `${newwidth}rem`
-//             if (newwidth < 50) {
-//                 requestAnimationFrame(extend)
-//             }
-//         }
-//         extend()
-//     }
-
-// })
-
-
-// onloading()
