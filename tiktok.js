@@ -15,6 +15,7 @@ const winningcombinations = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8
 let playerwin = 0, computerwin = 0
 let difficulty = 2;  // 0 is two player      1 is random (easy) computer        2 is hard computer
 let startedgame = false
+let blockedlist = []
 
 
 function countdown(num) {
@@ -163,11 +164,31 @@ function computer() {
     } 
 }
  
+// let differencearray = []
+
+
 function ai() {
 
-    console.log("ai");
+    let differencearray = []
+    let difference = 0;
+
+
+    for (x = 0; x < 8 ; x++) {
+        if(intersection(playervalue, winningcombinations[x]) == true) {
+            // console.log(x)
+            let diff = winningcombinations[x].filter((value) => !playervalue.includes(value)).toString()
+            differencearray.push(diff);
+            // console.log(`difference is ${diff}`)
+        }
+    }
+    
+    difference = differencearray.filter(value => !blockedlist.includes(value)).toString();
+
+
+    // console.log("ai");
     if (activegame == true) {
 
+        //  Priority is to go first
         if (activelist.length == 9) {
             //  Bot either starts in center or corner
 
@@ -187,14 +208,44 @@ function ai() {
                 document.getElementById(`${corners[cornerlocation]}`).blur();
             }
 
+        } else if (activelist.length == 1) {
+
+            document.getElementById(activelist[0]).click()
+
+        //  Second Priority is to block player if they're about to win
+        } else if (computervalue.includes(difference) == false && computervalue.length > 1 && difference.length > 0) {
+    
+            console.log(`${difference} is the difference`)
+            document.getElementById(difference).click()
+            if ( !(difference in blockedlist)) {
+                blockedlist.push(difference)
+            }
+            // blockedlist.push(difference)
+            console.log("locked")
+        
+
         } else if (activelist.includes(4)) {    //  If the center is avaliable
 
             document.getElementById("4").click();
             document.getElementById("4").blur();
 
+        } else if (computervalue.length <= 2) { 
+
+            const overlapcorner = corners.filter(value => activelist.includes(value))
+            let randomcorner = Math.floor(Math.random() * overlapcorner.length)
+            document.getElementById(overlapcorner[randomcorner]).click()
+
+        } else if (computervalue.includes(difference) == true) {
+
+            let random = Math.floor(Math.random() * activelist.length)
+            document.getElementById(`${activelist[random]}`).click()
+
+        } else {
+            let random = Math.floor(Math.random() * activelist.length)
+            document.getElementById(`${activelist[random]}`).click()
         }
 
-
+        
 
 
     }
@@ -259,6 +310,7 @@ function clearall(){
     activegame = true
     computerturn = 0, playerturn = 0;
     computervalue = [], playervalue = [];
+    blockedlist = []
 
 }
 
@@ -404,7 +456,7 @@ function onloading() {
 const easybutton = document.getElementById("buttoneasy")
 const hardbutton = document.getElementById("buttonhard")
 
-easybutton.addEventListener("pointerdown", function (event) {
+easybutton.addEventListener("click", function (event) {
     difficulty = 1
     gofirst = 1
     player = 0
@@ -416,12 +468,16 @@ easybutton.addEventListener("pointerdown", function (event) {
     
 })
 
-hardbutton.addEventListener("pointerdown", function (event) {
+hardbutton.addEventListener("click", function (event) {
     difficulty = 2
     gofirst = 0
     player = 1
-    document.getElementById("popup").style.display = "none"
-    ai()
+    document.getElementById("popup").classList.add("slideleft")
+    document.getElementById("buttoneasy").classList.add("hide")
+    document.getElementById("buttonhard").classList.add("hide")  
+    const delay = setTimeout(ai, 800)  
+    document.getElementById("whichturn").innerHTML = ("Player 1's turn")
+    
 })
 
 
@@ -447,7 +503,6 @@ document.getElementById("buttoneasy").addEventListener("animationend", function 
 })
 
 
-
 document.addEventListener("keydown", function (event) {
 
     if (event.key == "r") {
@@ -465,9 +520,46 @@ document.addEventListener("keydown", function (event) {
         buttoneasy.style.opacity = 1
         buttonhard.style.opacity = 1
         clearall()
+    } else if (event.key == "h") {
+
+        document.getElementById("buttonhard").click()
     }
 
 })
+
+
+function intersection(arr1, arr2) {
+
+    let combinationlocation = 0
+    const common = arr1.filter(value => arr2.includes(value))
+
+    if (common.length == 2) {
+        return true
+    } else {
+        return false
+    }
+
+    //  Find the common values of player value and all 8 of the winningcombinations
+
+    // let iftwo = (common.length == 2) ? alert("/") : console.log("not two")
+    //  If the intersection of the arrays is two, meaning 1 move away from winning
+
+    // for (x = 0; x < 8; x++) {
+    //     let thirdvaluelocation = common.filter(value => winningcombinations[x].includes(value))
+    //     if (thirdvaluelocation.length == 2) {
+    //         combinationlocation = x
+    //         console.log(`this is the location of the combination${x}`)
+    //         console.log(thirdvaluelocation)
+
+    //         let difference = winningcombinations[x].filter((value) => !arr1.includes(value));
+    //         console.log(difference)
+    //     }
+    // }
+
+    // let difference = winningcombinations[x].filter((value) => !arr1.includes(value));
+
+}
+
 // document.getElementById("popup").addEventListener("pointerenter", function (event) {
 
 //     if (startedgame == true) {
