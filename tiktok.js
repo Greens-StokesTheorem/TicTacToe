@@ -1,6 +1,7 @@
 const corners = [0,2,6,8]
 const middle = 4
 const sides = [1,3,5,7]
+const followcursor = document.getElementById("cursor")
 let gofirst = 0   //      0 computer starts       1 player starts
 let togglestate = [0,0,0,0,0,0,0,0,0]
 let activelist = [0,1,2,3,4,5,6,7,8]
@@ -14,10 +15,14 @@ const winningcombinations = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8
 //                                              0 0 0    0          0           0       0     0
 let playerwin = 0, computerwin = 0
 let difficulty = 2;  // 0 is two player      1 is random (easy) computer        2 is hard computer
+let difficultyarray = [0,0,0];
 let startedgame = false
 let blockedlistcomp = []
 let blockedlistplayer = []
 var delay0, delay1, delay2, delay3;
+let playername1;
+let playername2 = "Computer"
+let namecounter = 0
 
 
 function countdown(num) {
@@ -28,18 +33,18 @@ function togglefunc(number) {
  
     const button = document.getElementById(number);
  
-    // alert("Warning");
     if (togglestate[number] == 0 && activegame == true) {
  
-        playerturns(number)
+        changecursor(player)        // Changes the cursor which shows a circle or cross depending on whose turn it is
+        playerturns(number)         //  Changes which player's turn
         createacircle(number)       //  Creates circle
         togglestate[number] += 1;
         player = 1 - player         // Changes player
         activegame = true           // If game active, cannot remove circle
         activelist.splice(activelist.indexOf(number), 1)    //  Remove item from active list for computer
-        checkwin()
-        button.blur()
-        document.getElementById("whichturn").innerHTML = "Player 2's turn"
+        checkwin()                  //  Check is one player has 3 in a row
+        button.blur()               //  Stops the keyboard being able to click an element when it's in focus
+        document.getElementById("whichturn").innerHTML = `${playername2}'s turn`
  
  
     } else if (activegame == false){
@@ -50,14 +55,24 @@ function togglefunc(number) {
  
     if (player == 1) {
         
-        // Inline if statement
-        difficulty == 2 ? ai() : computer()
-        document.getElementById("whichturn").innerHTML = "Player 1's turn"
+        if (difficulty == 2) {
+            ai()
+        } else if (difficulty == 1) {
+            computer()
+        } else if (difficulty == 0) {
+            //  pass
+        }
+
+        document.getElementById("whichturn").innerHTML = `${playername1}'s turn`
 
     } else {
-        //pass
+
+        if (difficulty == 2) {
+            document.getElementById("whichturn").innerHTML = `${playername1}'s turn`
+        } else {
+            //  pass
+        }
     }
- 
  
 }
  
@@ -81,17 +96,17 @@ function checkwin(){
 
             if (playerresult == true){
 
-                document.getElementById("array").innerHTML = "Player has won!"
+                document.getElementById("array").innerHTML = `${playername1} has won!`
                 locationcombination = x
-                winner = "Player"
+                winner = playername1
                 activegame = false
                 addprogress(1)
 
             } else if (compresult == true){
 
-                document.getElementById("array").innerHTML = "Computer has won!"
+                document.getElementById("array").innerHTML = `${playername2} has won!`
                 locationcombination = x
-                winner = "Computer"
+                winner = playername2
                 activegame = false
                 addprogress(2)
             }
@@ -102,6 +117,7 @@ function checkwin(){
             winscreen.style.visibility = "visible"
             document.getElementById("winscreen").innerHTML = "It's a draw!"
             activegame = false
+            changecursor(2)
             drawline(8)
 
             //  Adds countdown to the popup
@@ -121,10 +137,15 @@ function checkwin(){
                 delay3 = window.setTimeout(ai, 3000)
             }
 
-        } else if (activegame == false && activelist.length > 0){
+        } else if (activegame == false && activelist.length >= 0){
 
             winscreen.style.visibility = "visible"
-            winscreen.innerHTML = winner
+            if (winner == undefined) {
+                winscreen.innerHTML = "It's a draw!"
+            } else {
+                winscreen.innerHTML = `${winner} has won!`
+            }
+            changecursor(2)
             drawline(locationcombination)
 
             let countdowntext = document.createElement("div")
@@ -136,7 +157,7 @@ function checkwin(){
             delay0 = window.setTimeout(countdown, 1000, 2)
             delay1 = window.setTimeout(countdown, 2000, 1)
             delay2 = window.setTimeout(function () {
-                alert("/")
+                // alert("/")
                 winscreen.style.visibility = "hidden";
                 clearall();
             }, 3000)
@@ -145,11 +166,14 @@ function checkwin(){
                 delay3 = window.setTimeout(ai, 3000)
             }
 
-            
-        }
+        } 
+
+
     }
 }
- 
+
+
+//  Changes which players' turn it is
 function playerturns(num){
  
     if (player == "0"){
@@ -186,6 +210,7 @@ function ai() {
     let newdifferenceplayer = [];
 
 
+    //  This checks the playervalue array for 2 in a row
     for (x = 0; x < 8 ; x++) {
         if(intersection(playervalue, winningcombinations[x]) == true) {
             let diff = winningcombinations[x].filter((value) => !playervalue.includes(value)).toString()
@@ -193,6 +218,8 @@ function ai() {
         }
     }
 
+    //  This checks the computervalue array for 2 in a row and creates a value call difference
+    //  which is the value needed to complete the 3 in a row
     for (x = 0; x < 8 ; x++) {
         if(intersection(computervalue, winningcombinations[x]) == true) {
             let diff = winningcombinations[x].filter((value) => !computervalue.includes(value)).toString()
@@ -200,15 +227,30 @@ function ai() {
         }
     }
 
+    //   If the other player has the "difference" it is placed in the blocked list
+    //   which means the difference is removed from array
     differencecomp = differencearraycomp.filter(value => !blockedlistcomp.includes(value));
     differenceplayer = differencearrayplayer.filter(value => !blockedlistplayer.includes(value));
 
-
+    //  Identical for the cpu but to check for wins
     newdifferencecomp = differencecomp.filter(value => !`${computervalue}`.includes(value));
     newdifferenceplayer = differenceplayer.filter(value => !`${playervalue}`.includes(value));
 
     console.log(`new difference is ${newdifferenceplayer}`)
 
+
+    //  This algorithm works by assinging priorities
+    //  Highest priority is to go first (either corner or center)
+
+    //  Second is if there is only one more avaliable space on the board
+
+    //  Third is if there is an opening in which the computer can complete a 3 in a row
+
+    //  Fourth is if there is an opening in which the player only needs one position to get 3 in a row
+    //  then the computer will block the position
+
+    //  Then the computer checks if center is avaliable
+    //  Lastly a random active position is clicked if all other options are not fulfilled
 
 
     if (activegame == true) {
@@ -237,23 +279,7 @@ function ai() {
 
             document.getElementById(activelist[0]).click()
 
-        //  Second Priority is to block player if they're about to win
-
-        } else if (newdifferencecomp.length == 1) {
-
-            document.getElementById(newdifferencecomp).click()
-            if ( !(newdifferencecomp in blockedlistcomp)) {
-                blockedlistcomp.push(newdifferencecomp)
-            }
-
-        } else if (computervalue.includes(differencecomp) == false && computervalue.length > 1 && newdifferencecomp.length > 1) {
-        
-            console.log(`${newdifferencecomp[0]} is the difference`)
-            document.getElementById(newdifferencecomp[0]).click()
-            if ( !(newdifferencecomp[0] in blockedlist)) {
-                blockedlist.push(newdifferencecomp[0])
-            }
-   
+        //  Clicks for a winning 3 in a row
         } else if (computervalue.includes(differencecomp) == false && computervalue.length > 1 && newdifferenceplayer.length == 1) {
 
             document.getElementById(newdifferenceplayer).click()
@@ -268,6 +294,22 @@ function ai() {
                 blockedlist.push(newdifferenceplayer[0])
             }
 
+        //  Blocks a player 3 in a row
+        } else if (newdifferencecomp.length == 1) {
+
+            document.getElementById(newdifferencecomp).click()
+            if ( !(newdifferencecomp in blockedlistcomp)) {
+                blockedlistcomp.push(newdifferencecomp)
+            }
+
+        } else if (computervalue.includes(differencecomp) == false && computervalue.length > 1 && newdifferencecomp.length > 1) {
+        
+            console.log(`${newdifferencecomp[0]} is the difference`)
+            document.getElementById(newdifferencecomp[0]).click()
+            if ( !(newdifferencecomp[0] in blockedlist)) {
+                blockedlist.push(newdifferencecomp[0])
+            }
+
         } else if (activelist.includes(4)) {    //  If the center is avaliable
 
             document.getElementById("4").click();
@@ -279,7 +321,7 @@ function ai() {
             let randomcorner = Math.floor(Math.random() * overlapcorner.length)
             document.getElementById(overlapcorner[randomcorner]).click()
 
-        } else if (computervalue.includes(difference) == true) {
+        } else if (computervalue.includes(newdifferenceplayer) == true) {
 
             let random = Math.floor(Math.random() * activelist.length)
             document.getElementById(`${activelist[random]}`).click()
@@ -288,8 +330,6 @@ function ai() {
             let random = Math.floor(Math.random() * activelist.length)
             document.getElementById(`${activelist[random]}`).click()
         }
-
-        checkwin()
 
     }
     
@@ -322,6 +362,8 @@ function removeelement(id){
  
 }
  
+
+//  Reset some values to be able to keep playing the same difficulty
 function clearall(){
  
     for (x = 0; x < 9; x++){
@@ -342,9 +384,6 @@ function clearall(){
         document.getElementById("winline").remove();
     }
 
-    document.getElementById("array").innerHTML = "Click to start";
-    document.getElementById("whichturn").innerHTML = ""
-
 
     //    Resets all values to restart game
     togglestate = [0,0,0,0,0,0,0,0,0]
@@ -363,11 +402,19 @@ function clearall(){
         player = 1
     }
 
+    changecursor(1 - player)
+
+    if (difficulty == 1) {
+        //  pass
+    } else {
+        document.getElementById("whichturn").innerHTML = `${playername1}'s turn`
+    }
 }
 
 
 function drawline(winningposition){
 
+    //  Gets position of the center of the squares
     let sidelength = document.getElementById("0").offsetWidth
     let row1 = document.getElementById("0").offsetTop + (0.5 * sidelength)
     let row2 = document.getElementById("3").offsetTop + (0.5 * sidelength)
@@ -386,6 +433,7 @@ function drawline(winningposition){
     line1.style.transform = "translate(-50%, -50%)"
     line1.style.transformOrigin = "0 0";
 
+    //  Assings position to the winning line from above
     if (winningposition == 0) {
         line1.style.left = `${column2}px`;
         line1.style.top = `${row1}px`;
@@ -433,48 +481,31 @@ function drawline(winningposition){
         console.log("draw")
 
     }
-
+    //  Places the line
     document.body.appendChild(line1);
 }
 
-document.addEventListener("keydown", function (event) {
 
-    if (event.key == "r") {
-       // clearall()
-    } else if (event.key == "a") {
-        drawline()
-    } else if (event.key == "o") {
-        addprogress(2)
-    } else if (event.code == "Space") {
 
-        if (activegame == false) {
-
-            window.clearTimeout(delay0)
-            window.clearTimeout(delay1)
-            window.clearTimeout(delay2)
-
-            winscreen.style.visibility = "hidden";
-            clearall()
-        }
-
-    }
-
-})
-
+//  The ability to skip the countdown to start the new round
 document.addEventListener("pointerdown", function (event) {
 
+
     if (activegame == false && difficulty == 2) {
+
+        disablebutton(true)
 
         window.clearTimeout(delay0)
         window.clearTimeout(delay1)
         window.clearTimeout(delay2)
         window.clearTimeout(delay3)
 
-        disablebutton(true)
+        if (document.getElementById("winline") != null) {
+            document.getElementById("winline").remove();
+        }
 
         winscreen.style.visibility = "hidden";
         clearall()
-        document.getElementById("winline").remove()
         disablebutton(false)
         ai()
 
@@ -491,6 +522,8 @@ document.addEventListener("pointerdown", function (event) {
 
 })
 
+
+//  Extends the progress bar for the repective winner on the score board
 function addprogress(number) {
 
     if (number == 1) {
@@ -501,18 +534,11 @@ function addprogress(number) {
         document.getElementById("counter2").innerHTML = computerwin
     }
 
-    let percent = document.getElementById(`progress${number}`).offsetHeight
-    document.getElementById(`progress${number}`).style.height = `${percent + 20}px`
+    let percent = document.getElementById(`progress${number}`).offsetWidth
+    document.getElementById(`progress${number}`).style.width = `${percent + 20}px`
 
 }
 
-function onloading() {
-
-    if (gofirst == 0 || player == 1) {
-        ai()
-    }
-
-}
 
 //      true = disable   false = enable
 function disablebutton(boolean) {
@@ -533,79 +559,181 @@ function disablebutton(boolean) {
 
 const easybutton = document.getElementById("buttoneasy")
 const hardbutton = document.getElementById("buttonhard")
+const twobutton = document.getElementById("buttontwoplayer")
 
+// Changes color of the difficulty button and assigns a difficulty
 easybutton.addEventListener("click", function (event) {
-    difficulty = 1
-    gofirst = 1
-    player = 0
-    // document.getElementById("popup").style.visibility = "hidden"
-    document.getElementById("popup").classList.add("slideleft")
-    document.getElementById("buttoneasy").classList.add("hide")
-    document.getElementById("buttonhard").classList.add("hide")
-    const delay = setTimeout(function () { document.getElementById("whichturn").innerHTML = ("Player 1's turn") }, 500)
+
+    document.getElementById("")
+    if (difficultyarray.indexOf(1) == -1) {
+
+        difficulty = 1
+        difficultyarray[1] = 1
+        easybutton.style.backgroundColor = "#4d41fc"
+        document.querySelector(".nameinput").classList.add("slideout")
     
+    } else {
+        //  If there are already difficulty selected, it clears the other buttons and clicks this one
+        difficultyarray = [0,0,0]
+        hardbutton.style.backgroundColor = "#e97f96"
+        twobutton.style.backgroundColor = "#63a7ff"
+        difficultyarray[1] = 1
+        easybutton.style.backgroundColor = "#4d41fc"
+
+    }
 })
 
 hardbutton.addEventListener("click", function (event) {
-    difficulty = 2
-    gofirst = 0
-    player = 1
-    document.getElementById("popup").classList.add("slideleft")
-    document.getElementById("buttoneasy").classList.add("hide")
-    document.getElementById("buttonhard").classList.add("hide")  
-    const delay = setTimeout(ai, 800)  
-    document.getElementById("whichturn").innerHTML = ("Player 1's turn")
+
+    if (difficultyarray.indexOf(1) == -1) {
+
+        difficulty = 2
+        difficultyarray[2] = 1
+        hardbutton.style.backgroundColor = "#4d41fc"
+        document.getElementById("nameinput").classList.add("slideout")
     
+    } else {
+
+        difficultyarray = [0,0,0]
+        easybutton.style.backgroundColor = "#b1abff"
+        twobutton.style.backgroundColor = "#63a7ff"
+        difficultyarray[2] = 1
+        hardbutton.style.backgroundColor = "#4d41fc"
+
+    }
+})
+
+twobutton.addEventListener("click", function (event) {
+
+    if (difficultyarray.indexOf(1) == -1) {
+
+        difficulty = 0
+        difficultyarray[0] = 1
+        twobutton.style.backgroundColor = "#4d41fc"
+        document.getElementById("nameinput").classList.add("slideout")
+    
+    } else {
+
+        difficultyarray = [0,0,0]
+        hardbutton.style.backgroundColor = "#e97f96"
+        easybutton.style.backgroundColor = "#b1abff"
+        difficultyarray[0] = 1
+        twobutton.style.backgroundColor = "#4d41fc"
+
+    }
 })
 
 
+//  When the enter button is clicked it sends the input to the scoreboard
+document.getElementById("enter").addEventListener("click", function (event) {
+
+    //  If two player is selected, two player names will be required
+    if (difficultyarray.indexOf(1) == 0 && namecounter == 0) {
+
+        namecounter += 1
+        playername1 = document.getElementById("nameinput").value
+        document.getElementById("nameinput").value = ""
+        document.getElementById("name1").innerHTML = playername1
+        document.getElementById("nameinput").placeholder = "Enter the second name"
+    } else if (difficultyarray.indexOf(1) == 0 && namecounter == 1) {
+
+        playername2 = document.getElementById("nameinput").value
+        document.getElementById("name2").innerHTML = playername2
+        const inputverify = playername1.length > 0 ? begingame() : null;
+
+
+
+    } else {
+
+        playername1 = document.getElementById("nameinput").value
+        document.getElementById("enter").classList.add("animation")
+        document.getElementById("name1").innerHTML = playername1
+        document.getElementById("name2").innerHTML = "Computer"
+        const inputverify = playername1.length > 0 ? begingame() : null;
+    }
+})
+
+
+//  This starts the game by hiding the starting menu screen and
+//  lets the hard computer go first if hard is selected
+function begingame() {
+
+    let difficultylevel = difficultyarray.indexOf(1)
+
+    if (difficultylevel == 0) {
+
+        hidestartmenu()
+        gofirst = 0
+        player = 1
+        
+        document.getElementById("whichturn").innerHTML = (`${playername1}'s turn`)
+        changecursor(0)
+
+    } else if (difficultylevel == 1) {
+
+        gofirst = 1
+        player = 0
+        // document.getElementById("popup").style.visibility = "hidden"
+        hidestartmenu()
+        changecursor(1)
+        const delay = setTimeout(function () { document.getElementById("whichturn").innerHTML = `${playername1}'s turn` }, 500)
+
+    } else if (difficultylevel == 2) {
+
+        gofirst = 0
+        player = 1
+        
+        hidestartmenu()
+        const delay = setTimeout(ai, 800)  
+        changecursor(1)
+
+    }
+
+}
+
+//  Hides all elements of the starting menu screen
+function hidestartmenu () {
+
+    document.getElementById("popup").classList.add("slideleft")
+    easybutton.classList.add("hide")
+    hardbutton.classList.add("hide") 
+    twobutton.classList.add("hide")
+    document.querySelector("h1").classList.add("animation")
+    document.getElementById("enter").classList.add("fadeout")
+    document.getElementById("nameinput").classList.add("fadeout")
+
+}
+
+//  When the animation to hide the starting menu screen ends
+//  javascript is used to manually change the css to keep its state
 document.getElementById("buttoneasy").addEventListener("animationend", function (event) {
 
     const menu = document.getElementById("popup")
-    // menu.style.left = "5%"
-    // menu.style.top = "50%"
-    // menu.style.width = "5rem"
-    // menu.style.boxShadow = "0 1rem 1rem hsla(0, 0%, 0%, 0.068)"
     document.getElementById("buttoneasy").style.opacity = "0"
     document.getElementById("buttonhard").style.opacity = "0"
-    // menu.classList.add("popup:hover")
+    
     startedgame = true
-    // menu.style.visibility = "hidden"
+
     menu.style.display = "none"
     document.getElementById("menu").style.display = "flex"
     document.getElementById("circlebin").classList.add("fade")
     document.getElementById("circleeasy").classList.add("fade")
     document.getElementById("circlehard").classList.add("fade")
+    document.getElementById("circletwo").classList.add("fade")
 
 
 })
 
 
-document.addEventListener("keydown", function (event) {
-
-    if (event.key == "r") {
-        const buttoneasy = document.getElementById("buttoneasy")
-        const buttonhard = document.getElementById("buttonhard")
-        const popup = document.getElementById("popup")
-
-        // document.getElementById("menu").style.visibility = "hidden"
-        document.getElementById("menu").style.display = "none"
-        // document.getElementById("popup").style.visibility = "visible"
-        document.getElementById("popup").style.display = "block"
-        buttoneasy.classList.remove("hide")
-        buttonhard.classList.remove("hide")
-        popup.classList.remove("slideleft")
-        buttoneasy.style.opacity = 1
-        buttonhard.style.opacity = 1
-        clearall()
-    } else if (event.key == "h") {
-
-        document.getElementById("buttonhard").click()
-    }
-
+//  When the enter animation ends, it removed the animation class so it can be added back later
+document.getElementById("enter").addEventListener("animationend", function (event) {
+    document.getElementById("enter").classList.remove("animation")
 })
 
 
+
+
+//  Finds the elements which are common in two arrays if there are two common elements this returns true, else false
 function intersection(arr1, arr2) {
 
     let combinationlocation = 0
@@ -619,3 +747,104 @@ function intersection(arr1, arr2) {
 
 }
 
+//  The naughts or cross indicator follows the cursor
+document.body.addEventListener("pointermove", function (event) {
+
+    //  Gets the position of the mose in the window
+    //  This moves the div to the position
+    followcursor.animate({
+        left: `${event.clientX}px`,
+        top: `${event.clientY}px`
+    //  Slight delay to add smoothness
+    }, {duration: 800, fill: "forwards"})
+
+})
+
+//  Alternates the cursor indicator
+//   From circle to cross and vice versa
+function changecursor(num) {
+
+    if (num == 0) {
+        //      Changes cursor to cross
+
+        document.querySelector(".circleshape").style.display = "none"
+        document.querySelector(".shape").style.display = "none"
+        document.querySelector(".crosshape").style.display = "block"
+        document.querySelector(".shapecross").style.display = "block"
+
+
+    } else if (num == 1) {
+        //      Changes cursor to circle
+
+        document.querySelector(".circleshape").style.display = "block"
+        document.querySelector(".shape").style.display = "block"
+        document.querySelector(".crosshape").style.display = "none"
+        document.querySelector(".shapecross").style.display = "none"
+
+    } else if (num == 2) {
+        //      Removes cursor
+
+        document.querySelector(".circleshape").style.display = "none"
+        document.querySelector(".shape").style.display = "none"
+        document.querySelector(".crosshape").style.display = "none"
+        document.querySelector(".shapecross").style.display = "none"
+
+    }
+
+}
+
+
+//  Does a total reset of the game which allows the player to select a different mode to play against
+function reshowmenu() {
+
+    clearall()
+    document.getElementById("whichturn").innerHTML = ""
+    playerwin = 0, computerwin = 0
+    difficulty = 2;  // 0 is two player      1 is random (easy) computer        2 is hard computer
+    difficultyarray = [0,0,0];
+    startedgame = false
+    blockedlistcomp = []
+    blockedlistplayer = []
+    delay0, delay1, delay2, delay3;
+    playername1;
+    playername2 = "Computer"
+    namecounter = 0
+
+    document.getElementById("popup").classList.remove("slideleft")
+    document.getElementById("popup").style.display = "block"
+    document.getElementById("menu").style.display = "none"
+    document.getElementById("buttoneasy").style.opacity = "1"
+    document.getElementById("buttonhard").style.opacity = "1"
+
+
+    document.getElementById("circlebin").classList.remove("fade")
+    document.getElementById("circleeasy").classList.remove("fade")
+    document.getElementById("circlehard").classList.remove("fade")
+    document.getElementById("circletwo").classList.remove("fade")
+
+    document.getElementById("popup").classList.remove("slideleft")
+    easybutton.classList.remove("hide")
+    hardbutton.classList.remove("hide") 
+    twobutton.classList.remove("hide")
+    document.querySelector("h1").classList.remove("animation")
+    document.getElementById("enter").classList.remove("fadeout")
+    document.getElementById("nameinput").classList.remove("fadeout")
+
+    document.getElementById("name1").innerHTML = ""
+    document.getElementById("name2").innerHTML = ""
+
+    document.getElementById("buttonhard").style.backgroundColor = "#e97f96"
+    document.getElementById("buttoneasy").style.backgroundColor = "#b1abff"
+    document.getElementById("buttontwoplayer").style.backgroundColor = "#63a7ff"
+
+    document.querySelector(".nameinput").classList.remove("slideout")
+    document.getElementById("nameinput").value = ""
+
+}
+
+
+//  Sidebar buttons will reset the game and shows the starting menu
+document.getElementById("circlebin").addEventListener("click", reshowmenu)
+document.getElementById("circleeasy").addEventListener("click", reshowmenu)
+document.getElementById("circlehard").addEventListener("click", reshowmenu)
+document.getElementById("circletwo").addEventListener("click", reshowmenu)
