@@ -96,7 +96,6 @@ function checkwin(){
 
             if (playerresult == true){
 
-                document.getElementById("array").innerHTML = `${playername1} has won!`
                 locationcombination = x
                 winner = playername1
                 activegame = false
@@ -104,7 +103,6 @@ function checkwin(){
 
             } else if (compresult == true){
 
-                document.getElementById("array").innerHTML = `${playername2} has won!`
                 locationcombination = x
                 winner = playername2
                 activegame = false
@@ -624,10 +622,9 @@ twobutton.addEventListener("click", function (event) {
 })
 
 
-//  When the enter button is clicked it sends the input to the scoreboard
+//  When the enter button is clicked it sends the input to the z
 document.getElementById("enter").addEventListener("click", function (event) {
 
-    //  If two player is selected, two player names will be required
     if (difficultyarray.indexOf(1) == 0 && namecounter == 0) {
 
         namecounter += 1
@@ -635,6 +632,9 @@ document.getElementById("enter").addEventListener("click", function (event) {
         document.getElementById("nameinput").value = ""
         document.getElementById("name1").innerHTML = playername1
         document.getElementById("nameinput").placeholder = "Enter the second name"
+
+
+
     } else if (difficultyarray.indexOf(1) == 0 && namecounter == 1) {
 
         playername2 = document.getElementById("nameinput").value
@@ -654,8 +654,6 @@ document.getElementById("enter").addEventListener("click", function (event) {
 })
 
 
-//  This starts the game by hiding the starting menu screen and
-//  lets the hard computer go first if hard is selected
 function begingame() {
 
     let difficultylevel = difficultyarray.indexOf(1)
@@ -685,13 +683,14 @@ function begingame() {
         
         hidestartmenu()
         const delay = setTimeout(ai, 800)  
+        // document.getElementById("whichturn").innerHTML = `${playername1}'s turn`
         changecursor(1)
 
     }
 
 }
 
-//  Hides all elements of the starting menu screen
+
 function hidestartmenu () {
 
     document.getElementById("popup").classList.add("slideleft")
@@ -704,8 +703,7 @@ function hidestartmenu () {
 
 }
 
-//  When the animation to hide the starting menu screen ends
-//  javascript is used to manually change the css to keep its state
+
 document.getElementById("buttoneasy").addEventListener("animationend", function (event) {
 
     const menu = document.getElementById("popup")
@@ -724,16 +722,35 @@ document.getElementById("buttoneasy").addEventListener("animationend", function 
 
 })
 
-
-//  When the enter animation ends, it removed the animation class so it can be added back later
 document.getElementById("enter").addEventListener("animationend", function (event) {
     document.getElementById("enter").classList.remove("animation")
 })
 
 
 
+document.addEventListener("keydown", function (event) {
 
-//  Finds the elements which are common in two arrays if there are two common elements this returns true, else false
+    if (event.key == "r") {
+
+        reshowmenu()
+
+    } else if (event.key == "h") {
+
+        // document.getElementById("enter").classList.add("animation")
+        document.getElementById("nameinput").classList.add("slideout")
+        // document.getElementById("buttonhard").click()
+        changecursor(0)
+
+    } else if (event.key == "Enter") {
+        
+        const enterkey = startedgame == false ? document.getElementById("enter").click() : null;
+
+    }
+
+
+})
+
+
 function intersection(arr1, arr2) {
 
     let combinationlocation = 0
@@ -747,21 +764,16 @@ function intersection(arr1, arr2) {
 
 }
 
-//  The naughts or cross indicator follows the cursor
 document.body.addEventListener("pointermove", function (event) {
 
-    //  Gets the position of the mose in the window
-    //  This moves the div to the position
     followcursor.animate({
         left: `${event.clientX}px`,
         top: `${event.clientY}px`
-    //  Slight delay to add smoothness
+    
     }, {duration: 800, fill: "forwards"})
 
 })
 
-//  Alternates the cursor indicator
-//   From circle to cross and vice versa
 function changecursor(num) {
 
     if (num == 0) {
@@ -793,8 +805,6 @@ function changecursor(num) {
 
 }
 
-
-//  Does a total reset of the game which allows the player to select a different mode to play against
 function reshowmenu() {
 
     clearall()
@@ -842,8 +852,6 @@ function reshowmenu() {
 
 }
 
-
-//  Sidebar buttons will reset the game and shows the starting menu
 document.getElementById("circlebin").addEventListener("click", reshowmenu)
 document.getElementById("circleeasy").addEventListener("click", reshowmenu)
 document.getElementById("circlehard").addEventListener("click", reshowmenu)
